@@ -16,10 +16,13 @@ import org.slf4j.LoggerFactory;
 
 import http.HttpMethod;
 import http.HttpRequest;
+import http.HttpResponse;
 
 import java.lang.AutoCloseable;
 
 public class ClientHandler implements AutoCloseable {
+
+	protected static final String LINEBREAK = "\r\n";
 
 	protected final Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -39,16 +42,36 @@ public class ClientHandler implements AutoCloseable {
 			HttpRequest request = parse();
 			log.debug("received {} request for resource '{}'",
 					request.getMethod(), request.getResource());
-			// TODO: send proper response
+			HttpResponse response = new HttpResponse();
+			response.setBody("<h1>Hello</1>");
+			write(response);
 			printer.println("HTTP/1.1 200 OK");
 		} catch (Exception e) {
 			log.debug("Exception while handling client.", e);
 		}
 	}
 	
+	private void write(HttpResponse response) {
+		
+		// only use HTTP 1.1 for now
+		printer.print("HTTP/"); printer.print(1); printer.print(1);
+		printer.print(" ");
+		printer.print(response.getStatus().getCode());
+		printer.print(" ");
+		printer.print(response.getStatus().getReason());
+		printer.print(LINEBREAK);
+		
+		printer.print("Content-Length: ");
+		printer.print(response.getContentLength());
+		printer.print(LINEBREAK);
+		
+		printer.print(LINEBREAK);
+		printer.print(response.getBody());
+	}
+
 	private HttpRequest parse() throws Exception {
 		
-		scanner.useDelimiter("\r\n");
+		scanner.useDelimiter(LINEBREAK);
 
 		HttpMethod method;
 		URI resource;
