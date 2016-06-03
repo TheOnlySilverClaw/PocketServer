@@ -1,5 +1,6 @@
 package http;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class HttpResponse {
@@ -13,6 +14,7 @@ public class HttpResponse {
 
 	public HttpResponse() {
 		this.status = HttpStatus.OK;
+		this.cookies = new LinkedList<>();
 	}
 
 	public final HttpStatus getStatus() {
@@ -27,11 +29,6 @@ public class HttpResponse {
 
 	public final List<HttpCookie> getCookies() {
 		return cookies;
-	}
-
-
-	public final void setCookies(List<HttpCookie> cookies) {
-		this.cookies = cookies;
 	}
 
 

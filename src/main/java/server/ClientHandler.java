@@ -3,17 +3,20 @@ package server;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.time.Instant;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import http.HttpCookie;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -38,12 +41,17 @@ public class ClientHandler implements AutoCloseable {
 
 	public void handle() {
 
+		// TODO: delegate logic to controllers
 		try {
 			HttpRequest request = parse();
 			log.debug("received {} request for resource '{}'",
 					request.getMethod(), request.getResource());
 			HttpResponse response = new HttpResponse();
 			response.setBody("<h1>Hello</1>");
+			HttpCookie cookie = new HttpCookie("test", UUID.randomUUID().toString());
+			cookie.setPath("/");
+			cookie.setExpires(Instant.now().plusSeconds(100));
+			response.getCookies().add(cookie);
 			write(response);
 			printer.println("HTTP/1.1 200 OK");
 		} catch (Exception e) {
@@ -52,7 +60,7 @@ public class ClientHandler implements AutoCloseable {
 	}
 	
 	private void write(HttpResponse response) {
-		
+
 		// only use HTTP 1.1 for now
 		printer.print("HTTP/"); printer.print(1); printer.print(1);
 		printer.print(" ");
@@ -65,8 +73,15 @@ public class ClientHandler implements AutoCloseable {
 		printer.print(response.getContentLength());
 		printer.print(LINEBREAK);
 		
+		for(HttpCookie cookie : response.getCookies()) {
+			printer.print("Set-Cookie: ");
+			printer.print(cookie.toCookieString());
+			printer.print(LINEBREAK);
+		}
+		
 		printer.print(LINEBREAK);
 		printer.print(response.getBody());
+		printer.close();
 	}
 
 	private HttpRequest parse() throws Exception {
