@@ -1,5 +1,7 @@
 package test.manual;
 
+import java.net.Inet4Address;
+import java.util.concurrent.CompletableFuture;
 import server.PocketServer;
 
 /**
@@ -10,7 +12,10 @@ public class Start {
 
 	public static void main(String[] args) throws Throwable {
 		
-		new PocketServer().start();
+		PocketServer server = new PocketServer();
+		CompletableFuture.runAsync(server::start);
+		Thread.sleep(50000);
+		server.stop();
 	}
 
 }
