@@ -1,19 +1,24 @@
 package server;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.*;
-import java.util.UUID;
-import java.time.LocalDateTime;
-import java.io.IOException;
-import java.net.*;
 
 public class PocketServer {
 
 	private final Logger log = LoggerFactory.getLogger(PocketServer.class);
 	
-	private final ExecutorService executorService;
+	//private final ExecutorService executorService;
 	private final ServerSocket server;
 	private boolean run;
 	
@@ -28,7 +33,7 @@ public class PocketServer {
 		this.server = new ServerSocket(port, backlog, bindAddr);
 		log.info("Created server on {}:{} with a backlog of {} connections.",
 				bindAddr.getHostAddress(), port, backlog);
-		this.executorService = executorService;
+		//this.executorService = executorService;
 		run = true;
 	}
 	

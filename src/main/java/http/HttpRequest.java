@@ -2,7 +2,6 @@ package http;
 
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URL;
 
 public class HttpRequest {
 

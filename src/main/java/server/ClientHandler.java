@@ -3,17 +3,13 @@ package server;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.HostnameVerifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
