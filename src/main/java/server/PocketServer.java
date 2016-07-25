@@ -5,20 +5,28 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import http.HttpCookie;
+import http.HttpMethod;
+import http.HttpRequest;
+import http.HttpResponse;
+import http.HttpStatus;
 
 public class PocketServer {
 
 	private final Logger log = LoggerFactory.getLogger(PocketServer.class);
 	
-	//private final ExecutorService executorService;
+	private final ExecutorService executorService;
 	private final ServerSocket server;
 	private boolean run;
 	
@@ -35,20 +43,29 @@ public class PocketServer {
 				bindAddr.getHostAddress(), port, backlog);
 		//this.executorService = executorService;
 		run = true;
+		this.executorService = executorService;
+
 	}
-	
+
 	public void start() {
 	
 		log.info("Starting {} at {}", getClass().getSimpleName(), LocalDateTime.now());
-	
+			
 		while(run) {
 			try {
 				log.debug("Waiting for connection...");
 				Socket client = server.accept();
 				log.debug("Accepted connection: {}", client);
 				// TODO: Close or keep connections alive correctly.
-				ClientHandler handler = new ClientHandler(client);
-				CompletableFuture.runAsync(handler::handle).thenRun(handler::close);
+				Future<HttpResponse> future = executorService.submit(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+					}
+				}, new HttpResponse());
+				
 				log.debug("Delegated to handler.");
 			} catch (SocketException e) {
 				log.debug("Socket closed successfully.");

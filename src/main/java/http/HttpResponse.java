@@ -1,20 +1,19 @@
 package http;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Iterator;
 
 public class HttpResponse {
 
 	private HttpStatus status;
 	//using my own implementation, since java.net.HttpCookie is just plain useless...
-	private List<HttpCookie> cookies;
+	private ArrayDeque<HttpCookie> cookies;
 	private String body;
-	private int contentLength;
 
 
 	public HttpResponse() {
 		this.status = HttpStatus.OK;
-		this.cookies = new LinkedList<>();
+		this.cookies = new ArrayDeque<>(8);
 	}
 
 	public final HttpStatus getStatus() {
@@ -26,11 +25,22 @@ public class HttpResponse {
 		this.status = status;
 	}
 
-
-	public final List<HttpCookie> getCookies() {
-		return cookies;
+	public HttpCookie findCookie(String name) {
+		for(HttpCookie cookie : cookies) {
+			if(cookie.getName().equals(name)) {
+				return cookie;
+			}
+		}
+		return null;
 	}
 
+	public void addCookie(HttpCookie cookie) {
+		cookies.add(cookie);
+	}
+	
+	public Iterator<HttpCookie> cookies() {
+		return cookies.iterator();
+	}
 
 	public final String getBody() {
 		return body;
@@ -39,11 +49,5 @@ public class HttpResponse {
 
 	public final void setBody(String body) {
 		this.body = body;
-		this.contentLength = body.getBytes().length;
-	}
-	
-	
-	public int getContentLength() {
-		return contentLength;
 	}
 }
