@@ -5,10 +5,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -16,11 +15,9 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import http.HttpCookie;
-import http.HttpMethod;
-import http.HttpRequest;
+import http.HttpSession;
+import http.HttpHandler;
 import http.HttpResponse;
-import http.HttpStatus;
 
 public class PocketServer {
 
@@ -29,6 +26,7 @@ public class PocketServer {
 	private final ExecutorService executorService;
 	private final ServerSocket server;
 	private boolean run;
+	private final ConnectionHandler connectionHandler;
 	
 	public PocketServer() throws UnknownHostException, IOException {
 		this(8080, 16, InetAddress.getLocalHost(),
@@ -41,10 +39,9 @@ public class PocketServer {
 		this.server = new ServerSocket(port, backlog, bindAddr);
 		log.info("Created server on {}:{} with a backlog of {} connections.",
 				bindAddr.getHostAddress(), port, backlog);
-		//this.executorService = executorService;
-		run = true;
 		this.executorService = executorService;
-
+		this.run = true;
+		this.connectionHandler = new HttpHandler();
 	}
 
 	public void start() {
@@ -56,16 +53,7 @@ public class PocketServer {
 				log.debug("Waiting for connection...");
 				Socket client = server.accept();
 				log.debug("Accepted connection: {}", client);
-				// TODO: Close or keep connections alive correctly.
-				Future<HttpResponse> future = executorService.submit(new Runnable() {
-					
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						
-					}
-				}, new HttpResponse());
-				
+				executorService.submit(connectionHandler.handle(client)::run);
 				log.debug("Delegated to handler.");
 			} catch (SocketException e) {
 				log.debug("Socket closed successfully.");

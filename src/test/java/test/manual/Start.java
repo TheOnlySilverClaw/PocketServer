@@ -1,13 +1,8 @@
 package test.manual;
 
 import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
-import http.HttpCookie;
 import http.HttpResponse;
 import server.PocketServer;
 

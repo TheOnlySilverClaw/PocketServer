@@ -1,32 +1,26 @@
 package http;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpConnection implements Callable<String>{
+/**
+ * Temporary solution. TODO: find alternative to Scanner
+ *
+ */
+public class HttpRequestParser {
 
-	protected static final String LINEBREAK = "\r\n";
-	protected static final Charset CHARSET = Charset.forName("utf-8");
+	public HttpRequest parse(InputStream in) throws Exception {
+
+		// should be closed by session
+		@SuppressWarnings("resource")
+		Scanner scanner = new Scanner(in);
 	
-	private final Scanner scanner;
-	
-	public HttpConnection(Socket client) throws IOException {
-		scanner = new Scanner(client.getInputStream());
-	}
-	
-	private HttpRequest parse() throws Exception {
-		
-		scanner.useDelimiter(LINEBREAK);
+		scanner.useDelimiter("\r\n");
 
 		HttpMethod method;
 		URI resource;
@@ -75,42 +69,5 @@ public class HttpConnection implements Callable<String>{
 		boolean keepAlive = headerMap.get("Connection").equals("keep-alive");
 	return new HttpRequest(method, resource, 1, 1,
 			hostAddress, hostPort, userAgent, keepAlive);
-	}
-	
-
-	@Override
-	public String call() throws Exception {
-		
-		HttpRequest request = parse();
-		
-		HttpResponse response = new HttpResponse();
-
-		StringBuilder printer = new StringBuilder(1024);
-		
-		// only use HTTP 1.1 for now
-		printer.append("HTTP/1.1");
-		printer.append(" ");
-		printer.append(response.getStatus().getCode());
-		printer.append(" ");
-		printer.append(response.getStatus().getReason());
-		printer.append(LINEBREAK);
-		
-		byte [] body = response.getBody().getBytes(CHARSET);
-		
-		printer.append("Content-Length: ");
-		printer.append(body.length);
-		
-		printer.append(LINEBREAK);
-		
-		response.cookies().forEachRemaining(cookie -> {
-			printer.append("Set-Cookie: ");
-			printer.append(cookie.toCookieString());
-			printer.append(LINEBREAK);
-		});
-		
-		printer.append(LINEBREAK);
-		printer.append(body);
-		
-		return printer.toString();
 	}
 }
