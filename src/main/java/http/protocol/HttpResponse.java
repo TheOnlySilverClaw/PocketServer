@@ -1,4 +1,4 @@
-package http;
+package http.protocol;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;

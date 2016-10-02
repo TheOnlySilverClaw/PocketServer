@@ -1,12 +1,17 @@
 package http;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import http.protocol.HttpMethod;
+import http.protocol.HttpRequest;
 
 /**
  * Temporary solution. TODO: find alternative to Scanner
@@ -67,7 +72,6 @@ public class HttpRequestParser {
 		
 		Object userAgent = headerMap.get("User-Agent");
 		boolean keepAlive = headerMap.get("Connection").equals("keep-alive");
-	return new HttpRequest(method, resource, 1, 1,
-			hostAddress, hostPort, userAgent, keepAlive);
+	return new HttpRequest(method, resource);
 	}
 }

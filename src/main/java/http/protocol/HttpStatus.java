@@ -1,8 +1,9 @@
-package http;
+package http.protocol;
 
 public enum HttpStatus {
 
-	OK(200, "OK");
+	OK(200, "OK"),
+	BAD_REQUEST(400, "Bad Request");
 	
 	private final int code;
 	private final String reason;

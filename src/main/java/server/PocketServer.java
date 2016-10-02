@@ -7,17 +7,14 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import http.HttpSession;
 import http.HttpHandler;
-import http.HttpResponse;
+import http.HttpRouter;
 
 public class PocketServer {
 
@@ -30,18 +27,18 @@ public class PocketServer {
 	
 	public PocketServer() throws UnknownHostException, IOException {
 		this(8080, 16, InetAddress.getLocalHost(),
-				Executors.newCachedThreadPool());
+				Executors.newCachedThreadPool(), new HttpRouter());
 	}
 	
 	public PocketServer(int port, int backlog, InetAddress bindAddr,
-			ExecutorService executorService)
+			ExecutorService executorService, HttpRouter router)
 			throws IOException {
 		this.server = new ServerSocket(port, backlog, bindAddr);
 		log.info("Created server on {}:{} with a backlog of {} connections.",
 				bindAddr.getHostAddress(), port, backlog);
 		this.executorService = executorService;
 		this.run = true;
-		this.connectionHandler = new HttpHandler();
+		this.connectionHandler = new HttpHandler(router);
 	}
 
 	public void start() {
